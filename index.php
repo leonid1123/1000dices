@@ -108,7 +108,7 @@
             </div>
         </form>
         <?php
-        $allFailures=array();
+        $allFailures = array();
         if (isset($_POST["go"])) {
             $numberOfAttacks = $_POST["numberOfAttacks"];
             $attacksMod = $_POST["inlineRadioOptions"];
@@ -194,10 +194,12 @@
         <p class="mt-3">Результат:</p>
         <p>
             <?php
-                foreach($res as $key=>$val) {
-                    $percent = $val*100/40000;
-                    echo "<p>$key раз проваленный сейв - $val раз ($percent %) </p>" ;
+            if (isset($_POST["go"])) {
+                foreach ($res as $key => $val) {
+                    $percent = $val * 100 / 40000;
+                    echo "<p>$key раз проваленный сейв - $val раз ($percent %) </p>";
                 }
+            }
             ?>
         </p>
     </div>
