@@ -13,6 +13,7 @@
 
 <body>
     <div class="container-md">
+        <p>Приложение моделирует одну и туже ситуации 40000 раз. Например, один космодесантник стреляет из болтера в половине дистанции в десантника отступника. Два выстрела, а попадание 3+, на ранение 4+, спасбросок 3+. Именно эта ситуация просчитывается 40000 раз. В итоге будет написано сколько раз хаосит проваливал спасброски.</p>
         <form action="index.php" method="post">
             <div class="col-3 mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Number of attacks</label>
@@ -107,7 +108,7 @@
             </div>
         </form>
         <?php
-        $tmpNumber = 0;
+        $allFailures=array();
         if (isset($_POST["go"])) {
             $numberOfAttacks = $_POST["numberOfAttacks"];
             $attacksMod = $_POST["inlineRadioOptions"];
@@ -139,56 +140,64 @@
                     die;
                     break;
             }
-            $numberOfHits = 0;
-            //сколько раз попал
-            for ($i = 0; $i < $numberOfAttacks; $i++) {
-                $x = random_int(1, 6);
-                if ($x >= $toHit) {
-                    $numberOfHits++;
-                } else if ($toHitMod == 1 && $x == 1) {//переброс единиц
+            //Начало цикла в 40000 итераций
+            for ($j = 0; $j < 40000; $j++) {
+                $numberOfHits = 0;
+                //сколько раз попал
+                for ($i = 0; $i < $numberOfAttacks; $i++) {
                     $x = random_int(1, 6);
-                    if ($x > $toHit) {
+                    if ($x >= $toHit) {
                         $numberOfHits++;
-                    }
-                } else if ($toHitMod == 2) {//полный переброс
-                    $x = random_int(1, 6);
-                    if ($x > $toHit) {
-                        $numberOfHits++;
+                    } else if ($toHitMod == 1 && $x == 1) { //переброс единиц
+                        $x = random_int(1, 6);
+                        if ($x > $toHit) {
+                            $numberOfHits++;
+                        }
+                    } else if ($toHitMod == 2) { //полный переброс
+                        $x = random_int(1, 6);
+                        if ($x > $toHit) {
+                            $numberOfHits++;
+                        }
                     }
                 }
-            }
-            $numberOfWounds = 0;
-            //сколько раз провундил
-            for ($i = 0; $i < $numberOfHits; $i++) {
-                $y = random_int(1, 6);
-                if ($y >= $toWound) {
-                    $numberOfWounds++;
-                } else if ($toWoundMod == 1 && $y == 1) {//переброс единиц
+                $numberOfWounds = 0;
+                //сколько раз провундил
+                for ($i = 0; $i < $numberOfHits; $i++) {
                     $y = random_int(1, 6);
                     if ($y >= $toWound) {
                         $numberOfWounds++;
-                    }
-                } else if ($toWoundMod == 2) {//полный переброс
-                    $y = random_int(1, 6);
-                    if ($y >= $toWound) {
-                        $numberOfWounds++;
+                    } else if ($toWoundMod == 1 && $y == 1) { //переброс единиц
+                        $y = random_int(1, 6);
+                        if ($y >= $toWound) {
+                            $numberOfWounds++;
+                        }
+                    } else if ($toWoundMod == 2) { //полный переброс
+                        $y = random_int(1, 6);
+                        if ($y >= $toWound) {
+                            $numberOfWounds++;
+                        }
                     }
                 }
-            }
-            $failedSaves=0;
-            for($i=0;$i<$numberOfWounds;$i++){
-                $z=random_int(1,6);
-                if($z<$save){
-                    $failedSaves++;
+                $failedSaves = 0;
+                for ($i = 0; $i < $numberOfWounds; $i++) {
+                    $z = random_int(1, 6);
+                    if ($z < $save) {
+                        $failedSaves++;
+                    }
                 }
-            }
+                $allFailures[$j] = $failedSaves;
+            } //Конец цикла 40000 итераций
+            $res = array_count_values($allFailures);
+            arsort($res);
         }
         ?>
-        <p class="mt-3">For results</p>
+        <p class="mt-3">Результат:</p>
         <p>
             <?php
-            echo $failedSaves;
-
+                foreach($res as $key=>$val) {
+                    $percent = $val*100/40000;
+                    echo "<p>$key раз проваленный сейв - $val раз ($percent %) </p>" ;
+                }
             ?>
         </p>
     </div>
