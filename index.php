@@ -7,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
     <link href="bootstrap/js/bootstrap.min.js">
-    <title>1000Rolls</title>
+    <title>40000Rolls</title>
 
 </head>
 
 <body>
     <div class="container-md">
         <p>Приложение моделирует одну и туже ситуации 40000 раз. Например, один космодесантник стреляет из болтера в половине дистанции в десантника отступника. Два выстрела, а попадание 3+, на ранение 4+, спасбросок 3+. Именно эта ситуация просчитывается 40000 раз. В итоге будет написано сколько раз хаосит проваливал спасброски.</p>
-        <form action="index.php" method="post">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             <div class="col-3 mb-3">
                 <label for="exampleFormControlInput1" class="form-label">Number of attacks</label>
                 <input type="number" class="form-control" id="exampleFormControlInput1" placeholder="1...100" name="numberOfAttacks">
@@ -51,19 +51,19 @@
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineRadioOptions1" id="inlineRadio6" value="1">
-                <label class="form-check-label" for="inlineRadio6">ReRoll 1</label>
+                <label class="form-check-label" for="inlineRadio6">ReRoll "1"</label>
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineRadioOptions1" id="inlineRadio7" value="2">
                 <label class="form-check-label" for="inlineRadio7">Full ReRoll</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="inlineRadioOptions1" id="inlineRadio8" value="3" disabled>
-                <label class="form-check-label" for="inlineRadio8">6 AutoWound</label>
+                <input class="form-check-input" type="radio" name="inlineRadioOptions1" id="inlineRadio8" value="3">
+                <label class="form-check-label" for="inlineRadio8">"6" AutoWound</label>
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineRadioOptions1" id="inlineRadio81" value="4" disabled>
-                <label class="form-check-label" for="inlineRadio8">6 AP-1</label>
+                <label class="form-check-label" for="inlineRadio8">"6" AP-1</label>
             </div>
             <div class="col-3 mb-3">
                 <p class="mt-3 mb-1">To Wound</p>
@@ -73,6 +73,7 @@
                     <option value="4">4+</option>
                     <option value="5">5+</option>
                     <option value="6">6+</option>
+                    <option value="1">AutoWound</option>
                 </select>
             </div>
             <div class="form-check form-check-inline">
@@ -81,7 +82,7 @@
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="inlineRadio10" value="1">
-                <label class="form-check-label" for="inlineRadio10">ReRoll 1</label>
+                <label class="form-check-label" for="inlineRadio10">ReRoll "1"</label>
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="inlineRadioOptions2" id="inlineRadio11" value="2">
@@ -120,7 +121,6 @@
             //$saveMod = $_POST["inlineCheckbox1"];
             if (is_integer((int)$numberOfAttacks)) {
                 $numberOfAttacks = (int)$numberOfAttacks;
-                $tmpNumber = $numberOfAttacks;
             } else {
                 die("Ooops!");
             }
@@ -143,6 +143,7 @@
             //Начало цикла в 40000 итераций
             for ($j = 0; $j < 40000; $j++) {
                 $numberOfHits = 0;
+                $numberOfWounds = 0;
                 //сколько раз попал
                 for ($i = 0; $i < $numberOfAttacks; $i++) {
                     $x = random_int(1, 6);
@@ -158,9 +159,11 @@
                         if ($x > $toHit) {
                             $numberOfHits++;
                         }
+                    } else if($toHitMod==3 && $x==6){
+                        $numberOfWounds++;
+                        continue 1;
                     }
                 }
-                $numberOfWounds = 0;
                 //сколько раз провундил
                 for ($i = 0; $i < $numberOfHits; $i++) {
                     $y = random_int(1, 6);
